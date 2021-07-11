@@ -1,6 +1,6 @@
 blueprint:
-  name: Toggle device status after a period of time and send TElegram
-  description: "Once a device has been in a defined status for a period of time, toggle it's status & send telegram Notification"
+  name: Toggle device status after a period of time
+  description: "Once a device has been in a defined status for a period of time, toggle it's status"
   domain: automation
   input:
     trigger_device:
