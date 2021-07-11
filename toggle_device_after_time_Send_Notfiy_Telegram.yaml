@@ -1,5 +1,5 @@
 blueprint:
-  name: Toggle device status after a period of time
+  name: Toggle device status after a period of time with sending Telegram notification
   description: "Once a device has been in a defined status for a period of time, toggle it's status"
   domain: automation
   input:
@@ -41,8 +41,4 @@ action:
   service: light.turn_off
    data:
     target: !input light_target
-  
-  service: telegram_bot.send_message
-  data:
-    message: !input 'notification_message'
-    Title: !input 'notification_title'
+
