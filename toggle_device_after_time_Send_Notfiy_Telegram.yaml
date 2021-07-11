@@ -1,6 +1,6 @@
 blueprint:
-  name: Toggle device status after a period of time with sending Telegram notification
-  description: "Once a device has been in a defined status for a period of time, toggle it's status"
+  name: Toggle device status after a period of time and send TElegram
+  description: "Once a device has been in a defined status for a period of time, toggle it's status & send telegram Notification"
   domain: automation
   input:
     trigger_device:
@@ -16,14 +16,6 @@ blueprint:
       description: What period to wait before toggling state?
       selector:
         time:
-    notification_title:
-      name: Notification title (Optional)
-      description: 'Default: "My Home Assistant"'
-      default: My Home Assistant
-    notification_message:
-      name: Notification message (Required)
-      description: 'Default: "Hassos has succesfully started!"'
-      default: Hassos has succesfully started!
 
 mode: restart
 max_exceeded: silent
@@ -38,7 +30,3 @@ action:
   service: homeassistant.toggle
   data:
     entity_id: "{{ trigger.entity_id }}"
-  service: light.turn_off
-   data:
-    target: !input light_target
-
