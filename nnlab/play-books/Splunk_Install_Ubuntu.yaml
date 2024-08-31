@@ -5,7 +5,7 @@
 
   vars:
     splunk_version: "9.1.0"  # Replace with the latest version
-    splunk_package_url: "https://download.splunk.com/products/splunk/releases/{{ splunk_version }}/linux/splunk-{{ splunk_version }}-xxxxxxx-linux-2.6-amd64.deb"
+    splunk_package_url: "https://download.splunk.com/products/splunk/releases/9.3.0/linux/splunk-9.3.0-51ccf43db5bd-linux-2.6-amd64.deb"
     splunk_home: "/opt/splunk"
     splunk_user: "splunk"
     splunk_password: "yourpassword"  # Replace with your password
