@@ -60,3 +60,28 @@
 
     - name: Restart Splunk service
       command: "{{ splunk_home }}/bin/splunk restart"
+
+    - name: Flush all existing iptables rules
+      command: iptables -F
+
+    - name: Set default policy to accept for INPUT chain
+      command: iptables -P INPUT ACCEPT
+
+    - name: Set default policy to accept for FORWARD chain
+      command: iptables -P FORWARD ACCEPT
+
+    - name: Set default policy to accept for OUTPUT chain
+      command: iptables -P OUTPUT ACCEPT
+
+    - name: Save iptables rules
+      command: netfilter-persistent save
+
+    - name: Restart netfilter-persistent service
+      service:
+        name: netfilter-persistent
+        state: restarted
+
+
+
+
+      
