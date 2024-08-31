@@ -19,6 +19,7 @@
       loop:
         - wget
         - tar
+        - iptables-persistent
 
     - name: Download Splunk Enterprise
       get_url:
