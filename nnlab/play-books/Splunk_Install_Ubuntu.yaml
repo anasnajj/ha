@@ -1,5 +1,5 @@
 ---
-- name: Install Splunk Enterprise and Enterprise Security on Ubuntu 22.04
+- name: Install Splunk Enterprise on Ubuntu 22.04
   hosts: all
   become: yes
 
@@ -8,8 +8,7 @@
     splunk_package_url: "https://download.splunk.com/products/splunk/releases/9.3.0/linux/splunk-9.3.0-51ccf43db5bd-linux-2.6-amd64.deb"
     splunk_home: "/opt/splunk"
     splunk_user: "splunk"
-    splunk_password: "yourpassword"  # Replace with your password
-    es_package_url: "https://splunkbase.splunk.com/app/263/#/details"  # Replace with the correct URL for Splunk ES package
+    splunk_password: "yourpassword"  # Replace with your desired password
 
   tasks:
 
@@ -44,14 +43,6 @@
 
     - name: Enable Splunk to start on boot
       command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ splunk_user }}"
-
-    - name: Download Splunk Enterprise Security app
-      get_url:
-        url: "{{ es_package_url }}"
-        dest: "/tmp/splunk-es.tgz"
-
-    - name: Install Splunk Enterprise Security app
-      command: "{{ splunk_home }}/bin/splunk install app /tmp/splunk-es.tgz -auth admin:{{ splunk_password }}"
 
     - name: Restart Splunk service
       command: "{{ splunk_home }}/bin/splunk restart"
