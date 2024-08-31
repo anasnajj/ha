@@ -1,0 +1,57 @@
+---
+- name: Install Splunk Enterprise and Enterprise Security on Ubuntu 22.04
+  hosts: all
+  become: yes
+
+  vars:
+    splunk_version: "9.1.0"  # Replace with the latest version
+    splunk_package_url: "https://download.splunk.com/products/splunk/releases/{{ splunk_version }}/linux/splunk-{{ splunk_version }}-xxxxxxx-linux-2.6-amd64.deb"
+    splunk_home: "/opt/splunk"
+    splunk_user: "splunk"
+    splunk_password: "yourpassword"  # Replace with your password
+    es_package_url: "https://splunkbase.splunk.com/app/263/#/details"  # Replace with the correct URL for Splunk ES package
+
+  tasks:
+
+    - name: Install dependencies
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - wget
+        - tar
+
+    - name: Download Splunk Enterprise
+      get_url:
+        url: "{{ splunk_package_url }}"
+        dest: "/tmp/splunk.deb"
+
+    - name: Install Splunk Enterprise
+      apt:
+        deb: "/tmp/splunk.deb"
+        state: present
+
+    - name: Create Splunk user
+      user:
+        name: "{{ splunk_user }}"
+        create_home: no
+        shell: /bin/bash
+
+    - name: Start Splunk service
+      command: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd {{ splunk_password }}"
+      args:
+        creates: "{{ splunk_home }}/etc/splunk-started"
+
+    - name: Enable Splunk to start on boot
+      command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ splunk_user }}"
+
+    - name: Download Splunk Enterprise Security app
+      get_url:
+        url: "{{ es_package_url }}"
+        dest: "/tmp/splunk-es.tgz"
+
+    - name: Install Splunk Enterprise Security app
+      command: "{{ splunk_home }}/bin/splunk install app /tmp/splunk-es.tgz -auth admin:{{ splunk_password }}"
+
+    - name: Restart Splunk service
+      command: "{{ splunk_home }}/bin/splunk restart"
