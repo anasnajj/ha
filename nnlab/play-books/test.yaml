@@ -1,0 +1,11 @@
+- name: Get current date and time from Linux
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Retrieve current date and time
+      shell: date
+      register: current_datetime
+
+    - name: Display the current date and time
+      debug:
+        msg: "The current date and time is: {{ current_datetime.stdout }}"
