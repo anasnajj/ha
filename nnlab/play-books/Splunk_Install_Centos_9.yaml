@@ -18,6 +18,7 @@
       loop:
         - wget
         - iptables-services
+        - initscripts
 
     - name: Download Splunk Enterprise
       get_url:
