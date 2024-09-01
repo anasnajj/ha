@@ -1,5 +1,5 @@
 ---
-- name: Install Splunk Enterprise on Ubuntu 22.04
+- name: Install Splunk Enterprise on CentOS 9
   hosts: all
   become: yes
 
@@ -11,24 +11,22 @@
     splunk_password: "yourpassword"  # Replace with your desired password
 
   tasks:
-
     - name: Install dependencies
-      apt:
+      yum:
         name: "{{ item }}"
         state: present
       loop:
         - wget
-        - tar
-        - iptables-persistent
+        - iptables-services
 
     - name: Download Splunk Enterprise
       get_url:
         url: "{{ splunk_package_url }}"
-        dest: "/tmp/splunk.deb"
+        dest: "/tmp/splunk.rpm"
 
     - name: Install Splunk Enterprise
-      apt:
-        deb: "/tmp/splunk.deb"
+      yum:
+        name: "/tmp/splunk.rpm"
         state: present
 
     - name: Create Splunk user
@@ -49,7 +47,6 @@
         path: "{{ splunk_home }}"
         mode: '0755'
         recurse: yes
-
 
     - name: Start Splunk service
       command: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd {{ splunk_password }}"
@@ -75,9 +72,9 @@
       command: iptables -P OUTPUT ACCEPT
 
     - name: Save iptables rules
-      command: netfilter-persistent save
+      command: service iptables save
 
-    - name: Restart netfilter-persistent service
+    - name: Restart iptables service
       service:
-        name: netfilter-persistent
+        name: iptables
         state: restarted
