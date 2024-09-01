@@ -1,0 +1,83 @@
+---
+- name: Install Splunk Enterprise on Ubuntu 22.04
+  hosts: all
+  become: yes
+
+  vars:
+    splunk_version: "9.3.0"  # Replace with the latest version
+    splunk_package_url: "https://download.splunk.com/products/splunk/releases/9.3.0/linux/splunk-9.3.0-51ccf43db5bd.x86_64.rpm"
+    splunk_home: "/opt/splunk"
+    splunk_user: "splunk"
+    splunk_password: "yourpassword"  # Replace with your desired password
+
+  tasks:
+
+    - name: Install dependencies
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - wget
+        - tar
+        - iptables-persistent
+
+    - name: Download Splunk Enterprise
+      get_url:
+        url: "{{ splunk_package_url }}"
+        dest: "/tmp/splunk.deb"
+
+    - name: Install Splunk Enterprise
+      apt:
+        deb: "/tmp/splunk.deb"
+        state: present
+
+    - name: Create Splunk user
+      user:
+        name: "{{ splunk_user }}"
+        create_home: no
+        shell: /bin/bash
+
+    - name: Set ownership of Splunk directory
+      file:
+        path: "{{ splunk_home }}"
+        owner: "{{ splunk_user }}"
+        group: "{{ splunk_user }}"
+        recurse: yes
+
+    - name: Set correct permissions for Splunk directory
+      file:
+        path: "{{ splunk_home }}"
+        mode: '0755'
+        recurse: yes
+
+
+    - name: Start Splunk service
+      command: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd {{ splunk_password }}"
+      args:
+        creates: "{{ splunk_home }}/etc/splunk-started"
+
+    - name: Enable Splunk to start on boot
+      command: "{{ splunk_home }}/bin/splunk enable boot-start -user {{ splunk_user }}"
+
+    - name: Restart Splunk service
+      command: "{{ splunk_home }}/bin/splunk restart"
+
+    - name: Flush all existing iptables rules
+      command: iptables -F
+
+    - name: Set default policy to accept for INPUT chain
+      command: iptables -P INPUT ACCEPT
+
+    - name: Set default policy to accept for FORWARD chain
+      command: iptables -P FORWARD ACCEPT
+
+    - name: Set default policy to accept for OUTPUT chain
+      command: iptables -P OUTPUT ACCEPT
+
+    - name: Save iptables rules
+      command: netfilter-persistent save
+
+    - name: Restart netfilter-persistent service
+      service:
+        name: netfilter-persistent
+        state: restarted
